@@ -37,7 +37,7 @@ var mountPoint = "/"
 var mainWindow; 
 
 function updateMixxx(){
-	
+	Amarok.debug("UPDATE MIXXX");
 	var homeDir = QDir.homePath();
 	var dbPath = homeDir + "/.mixxx/mixxxdb.sqlite";
 	
@@ -102,20 +102,16 @@ function init()
         mainWindow = UIloader.load( uifile, this ); //load the ui file
         uifile.close();
 
-        // read configuration
         readConfiguration();
 
-        // connect the button ok/cancel to save/read config.
         mainWindow.buttonBox.accepted.connect( saveConfiguration );
         mainWindow.buttonBox.rejected.connect( readConfiguration );
         
-        // Add tool menu, and a callback
         Amarok.Window.addSettingsMenu( "amarixxx", "Amarixxx Settings", "amarok" );
         Amarok.Window.SettingsMenu.amarixxx['triggered()'].connect(openSettings );
         
         Amarok.Window.addToolsMenu( "upd_mixxx", "Update mixxx", "amarok" );
-        Amarok.Window.SettingsMenu.upd_mixxx['triggered()'].connect(updateMixxx);
-        
+        Amarok.Window.ToolsMenu.upd_mixxx['triggered()'].connect(updateMixxx);
  
     }
     catch( err )
