@@ -19,3 +19,6 @@ amarok->settings->amarixxx
 
 mountpoint of the device where the collection lives. Default: "/".
 (I didn't find a way to get the absolute path in amarok today)
+
+## bugs
+settings are lost after restart

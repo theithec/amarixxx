@@ -77,6 +77,7 @@ function updateMixxx(){
 
 function saveConfiguration()
 {
+	Amarok.debug("save");
 	mountPoint = mainWindow.lineEdit.text;
 	Amarok.Script.writeConfig( "mountPoint", mountPoint  );
 }
@@ -107,10 +108,10 @@ function init()
         mainWindow.buttonBox.accepted.connect( saveConfiguration );
         mainWindow.buttonBox.rejected.connect( readConfiguration );
         
-        Amarok.Window.addSettingsMenu( "amarixxx", "Amarixxx Settings", "amarok" );
+        Amarok.Window.addSettingsMenu( "amarixxx", "Amarixxx Settings", "icon" );
         Amarok.Window.SettingsMenu.amarixxx['triggered()'].connect(openSettings );
         
-        Amarok.Window.addToolsMenu( "upd_mixxx", "Update mixxx", "amarok" );
+        Amarok.Window.addToolsMenu( "upd_mixxx", "Update mixxx", "icon" );
         Amarok.Window.ToolsMenu.upd_mixxx['triggered()'].connect(updateMixxx);
  
     }
