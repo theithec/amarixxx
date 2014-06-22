@@ -4,18 +4,16 @@ amarixxx
 Amaroks ratings to mixxx
 
 
-install
-=======
+## install
 
 Put the directory amarixxx into amarok/scripts.
 Restart amarok.
 
-usage
-======
+## usage
+
 amarok->extras->update mixxx
 
-settings
-========
+## settings
 
 amarok->settings->amarixxx
 mountpoint of the device where the collection lives. Default: "/"
