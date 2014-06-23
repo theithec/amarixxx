@@ -4,7 +4,7 @@ Type=script
 ServiceTypes=KPluginInfo
 Name=Amarixxx
 
-Comment=Writes amaroks metadata to mixxx
+Comment=Writes amaroks metadata(only ratings for now) to mixxx
 
 X-KDE-PluginInfo-Author=Tim Heithecker
 X-KDE-PluginInfo-Email=tim.heithecker@thtp.de
