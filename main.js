@@ -121,6 +121,4 @@ function init()
     }
 }
 
-var writeCover = true;
-var writeArtistAlbum = false;
 init();
