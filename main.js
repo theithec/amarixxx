@@ -6,7 +6,7 @@
 #   (C) 2014 Tim Heithecker  tim.heithecker@gmail.com					  #
 #																		  #
 #	This helped me:														  #
-#	http://forums.gentoo.org/viewtopic-p-5839391.html 
+#	http://forums.gentoo.org/viewtopic-p-5839391.html
 #   and source from copycover-script 					  #
 #                                                                         #
 #   This program is free software; you can redistribute it and/or modify  #
@@ -33,39 +33,40 @@ Importer.loadQtBinding("qt.sql");
 
 // no idea how to get the absolute path of an url
 var mountPoint = "/"
-	
-var mainWindow; 
+
+var mainWindow;
 
 function updateMixxx(){
 	Amarok.debug("UPDATE MIXXX");
 	var homeDir = QDir.homePath();
 	var dbPath = homeDir + "/.mixxx/mixxxdb.sqlite";
-	
+
 	var tracks = Amarok.Collection.query("" +
 	"SELECT title, rpath, rating FROM tracks,urls, statistics WHERE tracks.id=urls.id AND tracks.id=statistics.id ;");
-	
+
 	//mixxx
 	var m_db = QSqlDatabase.addDatabase("QSQLITE", "");
 	m_db.setDatabaseName(dbPath);
 	m_db.open();
 	var query = new QSqlQuery(m_db);
-	
+
 	for (i=0; i< tracks.length; i+=3){
 		title = tracks[i];
 		rpath = tracks[i+1];
 		a_rating = tracks[i+2];
 		m_rating = Math.floor(a_rating/2);
-		
+
 		fpath = mountPoint + rpath.slice(1);
-		
+
 		updsql = (	"UPDATE library " +
 					"SET rating=" + m_rating +" WHERE id = ("+
-					"	SELECT  library.id  FROM track_locations, library " + 
+					"	SELECT  library.id  FROM track_locations, library " +
 					"	WHERE   track_locations.location=\"" + fpath  + "\" AND " +
 					"		 library.location=track_locations.id)"
 		);
-		query.exec(updsql);
-		Amarok.debug("Amarixxx found " + fpath + " " + a_rating);
+		res = query.exec(updsql);
+		Amarok.debug("Amarixxx:Amarok " + fpath + " " + a_rating);
+		Amarok.debug("Amarixxx:Mixxx" + res);
 		nr = Math.floor(i/3)
 		if (nr % 1000 == 0){
 			Amarok.Window.Statusbar.shortMessage("amarixxx: " + nr + " songs updated");
@@ -107,13 +108,13 @@ function init()
 
         mainWindow.buttonBox.accepted.connect( saveConfiguration );
         mainWindow.buttonBox.rejected.connect( readConfiguration );
-        
+
         Amarok.Window.addSettingsMenu( "amarixxx", "Amarixxx Settings", "icon" );
         Amarok.Window.SettingsMenu.amarixxx['triggered()'].connect(openSettings );
-        
+
         Amarok.Window.addToolsMenu( "upd_mixxx", "Update mixxx", "icon" );
         Amarok.Window.ToolsMenu.upd_mixxx['triggered()'].connect(updateMixxx);
- 
+
     }
     catch( err )
     {

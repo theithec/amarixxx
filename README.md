@@ -5,13 +5,18 @@ Amaroks ratings to mixxx
 
 
 ## install
+1.  git clone
+    or
+    download the zipp-file and rename the folder to amarixxx
 
-Put the directory amarixxx into amarok/scripts.
+2. Put the directory amarixxx into amarok/scripts.
 Restart amarok.
 
 ## usage
 
 amarok->extras->update mixxx
+
+
 
 ## settings
 
