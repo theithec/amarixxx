@@ -4,26 +4,35 @@ amarixxx
 Amaroks ratings to mixxx
 
 
-## install
-1.  git clone
-    or
-    download the zipp-file and rename the folder to amarixxx
+## Requirements:
+Mixxx (http://www.mixxx.org/).
+Mixxx' database is expected to be found at ~/.mixxx/mixxxdb.sqlite
 
-2. Put the directory amarixxx into amarok/scripts.
+
+## Install
+In amarok/scripts/ run git clone ... or
+extract the zip-file and rename the folder to amarixxx
+
 Restart amarok.
 
-## usage
+
+
+## Usage
 
 amarok->extras->update mixxx
 
 
 
-## settings
+## Settings
 
 amarok->settings->amarixxx
 
 mountpoint of the device where the collection lives. Default: "/".
-(I didn't find a way to get the absolute path in amarok today)
+(I didn't find an easy way to get the absolute path)
 
-## bugs
-settings are lost after restart
+## Problems
+try amarok --debug
+
+
+
+

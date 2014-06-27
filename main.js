@@ -31,19 +31,20 @@ Importer.loadQtBinding( "qt.uitools" );
 Importer.loadQtBinding("qt.sql");
 
 
-// no idea how to get the absolute path of an url
+// no idea how to get easily the absolute path of an url
 var mountPoint = "/"
 
 var mainWindow;
 
 function updateMixxx(){
-    return;
 	Amarok.debug("UPDATE MIXXX");
 	var homeDir = QDir.homePath();
 	var dbPath = homeDir + "/.mixxx/mixxxdb.sqlite";
 
 	var tracks = Amarok.Collection.query("" +
-	"SELECT title, rpath, rating FROM tracks,urls, statistics WHERE tracks.id=urls.id AND tracks.id=statistics.id ;");
+    	"SELECT title, rpath, rating " +
+    	"FROM tracks,urls, statistics " +
+    	"WHERE tracks.id=urls.id AND tracks.id=statistics.id ;");
 
 	//mixxx
 	var m_db = QSqlDatabase.addDatabase("QSQLITE", "");
@@ -68,8 +69,9 @@ function updateMixxx(){
 		res = query.exec(updsql);
 		Amarok.debug("Amarixxx:Amarok " + fpath + " " + a_rating);
 		Amarok.debug("Amarixxx:Mixxx " + res);
-		if (i/3 % 1000 == 0){
-			Amarok.Window.Statusbar.shortMessage("amarixxx: " + i/3 + " songs updated");
+		nr = i/3; // 3 = title, rpath, rating
+		if ( nr % 1000 == 0){
+			Amarok.Window.Statusbar.shortMessage("amarixxx: " + nr + " songs updated");
 		}
 	}
 	m_db.close();
@@ -78,7 +80,6 @@ function updateMixxx(){
 
 function saveConfiguration()
 {
-	Amarok.debug("save");
 	mountPoint = mainWindow.lineEdit.text;
 	Amarok.Script.writeConfig( "mountPoint", mountPoint  );
 }
@@ -86,7 +87,7 @@ function saveConfiguration()
 function readConfiguration()
 {
 	mountPoint = Amarok.Script.readConfig( "mountPoint", mountPoint )
-	Amarok.debug("read " + mountPoint);
+	mainWindow.lineEdit.text = mountPoint;
 }
 
 function openSettings()
@@ -99,7 +100,6 @@ function init()
     try
     {
         // Ui stuff
-        readConfiguration();
         var UIloader = new QUiLoader( this );
         var uifile = new QFile ( Amarok.Info.scriptPath() + "/amarixxx.ui" );
         uifile.open( QIODevice.ReadOnly );
@@ -107,6 +107,7 @@ function init()
         uifile.close();
 
 
+        readConfiguration();
         mainWindow.buttonBox.accepted.connect( saveConfiguration );
         mainWindow.buttonBox.rejected.connect( readConfiguration );
 
