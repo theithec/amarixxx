@@ -37,6 +37,7 @@ var mountPoint = "/"
 var mainWindow;
 
 function updateMixxx(){
+    return;
 	Amarok.debug("UPDATE MIXXX");
 	var homeDir = QDir.homePath();
 	var dbPath = homeDir + "/.mixxx/mixxxdb.sqlite";
@@ -66,10 +67,9 @@ function updateMixxx(){
 		);
 		res = query.exec(updsql);
 		Amarok.debug("Amarixxx:Amarok " + fpath + " " + a_rating);
-		Amarok.debug("Amarixxx:Mixxx" + res);
-		nr = Math.floor(i/3)
-		if (nr % 1000 == 0){
-			Amarok.Window.Statusbar.shortMessage("amarixxx: " + nr + " songs updated");
+		Amarok.debug("Amarixxx:Mixxx " + res);
+		if (i/3 % 1000 == 0){
+			Amarok.Window.Statusbar.shortMessage("amarixxx: " + i/3 + " songs updated");
 		}
 	}
 	m_db.close();
@@ -86,6 +86,7 @@ function saveConfiguration()
 function readConfiguration()
 {
 	mountPoint = Amarok.Script.readConfig( "mountPoint", mountPoint )
+	Amarok.debug("read " + mountPoint);
 }
 
 function openSettings()
@@ -98,13 +99,13 @@ function init()
     try
     {
         // Ui stuff
+        readConfiguration();
         var UIloader = new QUiLoader( this );
         var uifile = new QFile ( Amarok.Info.scriptPath() + "/amarixxx.ui" );
         uifile.open( QIODevice.ReadOnly );
         mainWindow = UIloader.load( uifile, this ); //load the ui file
         uifile.close();
 
-        readConfiguration();
 
         mainWindow.buttonBox.accepted.connect( saveConfiguration );
         mainWindow.buttonBox.rejected.connect( readConfiguration );
