@@ -1,13 +1,13 @@
 /*#########################################################################
 #                                                                         #
-#   Updates mixxx' database with amaroks ratings              			  #
+#   Updates mixxx' database with amaroks ratings                          #
 #                                                                         #
 #   Copyright                                                             #
-#   (C) 2014 Tim Heithecker  tim.heithecker@gmail.com					  #
-#																		  #
-#	This helped me:														  #
-#	http://forums.gentoo.org/viewtopic-p-5839391.html
-#   and source from copycover-script 					  #
+#   (C) 2014 Tim Heithecker - tim.heithecker@gmail.com                    #
+#                                                                         #
+#	This helped me:                                                       #
+#	http://forums.gentoo.org/viewtopic-p-5839391.html                     #
+#   and source from copycover-script                                      #
 #                                                                         #
 #   This program is free software; you can redistribute it and/or modify  #
 #   it under the terms of the GNU General Public License as published by  #
@@ -32,7 +32,7 @@ Importer.loadQtBinding("qt.sql");
 
 
 // no idea how to get easily the absolute path of an url
-var mountPoint = "/"
+var mountPoint = "/";
 
 var mainWindow;
 
@@ -86,7 +86,7 @@ function saveConfiguration()
 
 function readConfiguration()
 {
-	mountPoint = Amarok.Script.readConfig( "mountPoint", mountPoint )
+	mountPoint = Amarok.Script.readConfig( "mountPoint", mountPoint );
 	mainWindow.lineEdit.text = mountPoint;
 }
 
