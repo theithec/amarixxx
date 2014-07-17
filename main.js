@@ -6,8 +6,10 @@
 #   (C) 2014 Tim Heithecker - tim.heithecker@gmail.com                    #
 #                                                                         #
 #	This helped me:                                                       #
-#	http://forums.gentoo.org/viewtopic-p-5839391.html                     #
-#   and source from copycover-script                                      #
+#	http://forums.gentoo.org/viewtopic-p-5839391.html (qtscript/sqlite)   #
+#   and source from copycover-script (as template) 		                  #
+#   and https://github.com/droopy4096/amarok/blob/master/export_rated.py  #
+#	(get full path from uuid)                                             #
 #                                                                         #
 #   This program is free software; you can redistribute it and/or modify  #
 #   it under the terms of the GNU General Public License as published by  #
@@ -26,68 +28,84 @@
 ##########################################################################*/
 
 Importer.loadQtBinding("qt.core");
-Importer.loadQtBinding( "qt.gui" );
-Importer.loadQtBinding( "qt.uitools" );
+Importer.loadQtBinding("qt.gui" );
+Importer.loadQtBinding("qt.uitools" );
 Importer.loadQtBinding("qt.sql");
 
-
-// no idea how to get easily the absolute path of an url
-var mountPoint = "/";
-
+var mixxxDBPath; 
 var mainWindow;
 
-function updateMixxx(){
+
+function _realUpdateMixxx(){
+	
 	Amarok.debug("UPDATE MIXXX");
-	var homeDir = QDir.homePath();
-	var dbPath = homeDir + "/.mixxx/mixxxdb.sqlite";
-
-	var tracks = Amarok.Collection.query("" +
-    	"SELECT title, rpath, rating " +
-    	"FROM tracks,urls, statistics " +
-    	"WHERE tracks.id=urls.id AND tracks.id=statistics.id ;");
-
+		
+	sql = "SELECT t.title, s.rating, CONCAT(d.lastmountpoint,SUBSTR(u.rpath,2)) " +
+		  "FROM tracks AS t,urls AS u, statistics AS s, devices AS d " +
+		  "WHERE t.id=u.id " +
+		  "AND u.deviceid = d.id " +
+		  "AND t.id=s.id ;";
+		
+	//Amarok.debug("Amarixxx:query = "  + sql);
+	var tracks = Amarok.Collection.query(sql);
+	
 	//mixxx
+	f = new QFile(mixxxDBPath);
+	if (!f.exists()){
+		throw(mixxxDBPath + " does not exist");
+	}
 	var m_db = QSqlDatabase.addDatabase("QSQLITE", "");
-	m_db.setDatabaseName(dbPath);
+	m_db.setDatabaseName(mixxxDBPath);
 	m_db.open();
 	var query = new QSqlQuery(m_db);
-
+	
 	for (i=0; i< tracks.length; i+=3){
 		title = tracks[i];
-		rpath = tracks[i+1];
-		a_rating = tracks[i+2];
+		a_rating = tracks[i+1];
+		rpath = tracks[i+2];
 		m_rating = Math.floor(a_rating/2);
-
-		fpath = mountPoint + rpath.slice(1);
-
+	
 		updsql = (	"UPDATE library " +
 					"SET rating=" + m_rating +" WHERE id = ("+
 					"	SELECT  library.id  FROM track_locations, library " +
-					"	WHERE   track_locations.location=\"" + fpath  + "\" AND " +
+					"	WHERE   track_locations.location=\"" + rpath  + "\" AND " +
 					"		 library.location=track_locations.id)"
 		);
 		res = query.exec(updsql);
-		Amarok.debug("Amarixxx:Amarok " + fpath + " " + a_rating);
+		Amarok.debug("Amarixxx:Amarok " + rpath + " " + a_rating);
 		Amarok.debug("Amarixxx:Mixxx " + res);
-		nr = i/3; // 3 = title, rpath, rating
+		nr = i/3; // 3 = title, path, rating
 		if ( nr % 1000 == 0){
 			Amarok.Window.Statusbar.shortMessage("amarixxx: " + nr + " songs updated");
 		}
 	}
 	m_db.close();
 	Amarok.alert("Mixxx db updated.");
+	
+}
+
+function updateMixxx(){
+	try{
+		_realUpdateMixxx();
+	} catch( err ){
+	    Amarok.debug( err );
+	    Amarok.alert("Amarixx-Error\n" + err);
+	}
 }
 
 function saveConfiguration()
 {
-	mountPoint = mainWindow.lineEdit.text;
-	Amarok.Script.writeConfig( "mountPoint", mountPoint  );
+	mixxxDBPath = mainWindow.lineEdit.text;
+	Amarok.Script.writeConfig( "mixxx-DB", mixxxDBPath  );
 }
 
 function readConfiguration()
 {
-	mountPoint = Amarok.Script.readConfig( "mountPoint", mountPoint );
-	mainWindow.lineEdit.text = mountPoint;
+	mixxxDBPath = Amarok.Script.readConfig(
+		"mixxx-DB",
+		QDir.homePath() + "/.mixxx/mixxxdb.sqlite"
+	);
+	mainWindow.lineEdit.text = mixxxDBPath;
 }
 
 function openSettings()
