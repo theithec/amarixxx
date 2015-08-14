@@ -78,9 +78,9 @@ function updateMixxx(){
 	mixxxDb.open();
 	query = new QSqlQuery(mixxxDb);
 	var cnt = 0;
-	for (i=0; i< tracks.length; i+=2){
-    var rating = Math.floor(tracks[0] / 2);
-    var trackPath= tracks[1];
+	for (i=0; i< amarokTracks.length; i+=2){
+    var rating = Math.floor(amarokTracks[0] / 2);
+    var trackPath=amarokTracks[1];
     updateTrackIfDifferent(trackPath, rating);
 		cnt = i/2; //  path, rating
 		if ( cnt % 1000 == 0){
