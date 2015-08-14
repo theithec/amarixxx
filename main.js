@@ -32,66 +32,65 @@ Importer.loadQtBinding("qt.gui" );
 Importer.loadQtBinding("qt.uitools" );
 Importer.loadQtBinding("qt.sql");
 
-var mixxxDBPath; 
+
 var mainWindow;
+var mixxxDBPath;  
+var mixxxDb; 
+var query;
+var countUpdated = 0;
+function updateTrackIfDifferent(trackPath, rating){
+  var msql = "UPDATE library  SET rating=" + rating  + " WHERE id=(" +                                                                                                               
+              "SELECT  l.id FROM track_locations tl, library l " + 
+              "WHERE tl.location LIKE \"" + trackPath + "\" AND l.id=tl.id AND l.rating<>" + rating +");";
+  Amarok.debug("Amarixxx:Amarok " + msql);
+  query.exec(msql);
+  if (query.numRowsAffected()>0){
+    countUpdated++;
+    Amarok.debug("Amarixxx:Mixxx Updated rating=" + rating + " for " + trackPath );
+    
+  }
 
+}
 
-function _realUpdateMixxx(){
+function updateMixxx(){
 	
 	Amarok.debug("UPDATE MIXXX");
 		
-	sql = "SELECT t.title, s.rating, CONCAT(d.lastmountpoint,SUBSTR(u.rpath,2)) " +
+	amarokSql = "SELECT s.rating, CONCAT(d.lastmountpoint,SUBSTR(u.rpath,2)) " +
 		  "FROM tracks AS t,urls AS u, statistics AS s, devices AS d " +
 		  "WHERE t.id=u.id " +
 		  "AND u.deviceid = d.id " +
 		  "AND t.id=s.id ;";
 		
 	//Amarok.debug("Amarixxx:query = "  + sql);
-	var tracks = Amarok.Collection.query(sql);
+	var amarokTracks = Amarok.Collection.query(aSql);
 	
-	//mixxx
-	f = new QFile(mixxxDBPath);
-	if (!f.exists()){
-		throw(mixxxDBPath + " does not exist");
-	}
-	var m_db = QSqlDatabase.addDatabase("QSQLITE", "");
-	m_db.setDatabaseName(mixxxDBPath);
-	m_db.open();
-	var query = new QSqlQuery(m_db);
-	
-	for (i=0; i< tracks.length; i+=3){
-		title = tracks[i];
-		a_rating = tracks[i+1];
-		rpath = tracks[i+2];
-		m_rating = Math.floor(a_rating/2);
-	
-		updsql = (	"UPDATE library " +
-					"SET rating=" + m_rating +" WHERE id = ("+
-					"	SELECT  library.id  FROM track_locations, library " +
-					"	WHERE   track_locations.location=\"" + rpath  + "\" AND " +
-					"		 library.location=track_locations.id)"
-		);
-		res = query.exec(updsql);
-		Amarok.debug("Amarixxx:Amarok " + rpath + " " + a_rating);
-		Amarok.debug("Amarixxx:Mixxx " + res);
-		nr = i/3; // 3 = title, path, rating
-		if ( nr % 1000 == 0){
-			Amarok.Window.Statusbar.shortMessage("amarixxx: " + nr + " songs updated");
+  f = new QFile(mixxxDBPath);
+  if (!f.exists()){
+	  throw(mixxxDBPath + " does not exist");
+  }
+  mixxxDb = QSqlDatabase.addDatabase("QSQLITE", "");
+  mixxxDb.setDatabaseName(mixxxDBPath);
+  mixxxDb.open();
+
+	mixxxDb.setDatabaseName(mixxxDBPath);
+	mixxxDb.open();
+	query = new QSqlQuery(mixxxDb);
+	var cnt = 0;
+	for (i=0; i< tracks.length; i+=2){
+    var rating = Math.floor(tracks[0] / 2);
+    var trackPath= tracks[1];
+    updateTrackIfDifferent(trackPath, rating);
+		cnt = i/2; //  path, rating
+		if ( cnt % 1000 == 0){
+			Amarok.Window.Statusbar.shortMessage("amarixxx: " + cnt + " songs checked");
 		}
 	}
-	m_db.close();
-	Amarok.alert("Mixxx db updated.");
+	mixxxDB.close();
+	Amarok.alert("Mixxx db " + countUpdated + " updated.");
 	
 }
 
-function updateMixxx(){
-	try{
-		_realUpdateMixxx();
-	} catch( err ){
-	    Amarok.debug( err );
-	    Amarok.alert("Amarixx-Error\n" + err);
-	}
-}
 
 function saveConfiguration()
 {
