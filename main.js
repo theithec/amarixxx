@@ -53,6 +53,7 @@ function updateTrackIfDifferent(trackPath, rating){
 }
 
 function updateMixxx(){
+	try{
 	
 	Amarok.debug("UPDATE MIXXX");
 		
@@ -62,8 +63,8 @@ function updateMixxx(){
 		  "AND u.deviceid = d.id " +
 		  "AND t.id=s.id ;";
 		
-	//Amarok.debug("Amarixxx:query = "  + sql);
-	var amarokTracks = Amarok.Collection.query(aSql);
+	Amarok.debug("Amarixxx:query = "  + amarokSql);
+	var amarokTracks = Amarok.Collection.query(amarokSql);
 	
   f = new QFile(mixxxDBPath);
   if (!f.exists()){
@@ -88,7 +89,10 @@ function updateMixxx(){
 	}
 	mixxxDB.close();
 	Amarok.alert("Mixxx db " + countUpdated + " updated.");
-	
+	} catch( err ){
+	    Amarok.debug( err );
+	    Amarok.alert("Amarixx-Error\n" + err);
+	}
 }
 
 
