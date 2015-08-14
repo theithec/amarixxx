@@ -40,109 +40,114 @@ var query;
 var countUpdated = 0;
 function updateTrackIfDifferent(trackPath, rating){
   var msql = "UPDATE library  SET rating=" + rating  + " WHERE id=(" +                                                                                                               
-              "SELECT  l.id FROM track_locations tl, library l " + 
-              "WHERE tl.location LIKE \"" + trackPath + "\" AND l.id=tl.id AND l.rating<>" + rating +");";
+    "SELECT  l.id FROM track_locations tl, library l " + 
+    "WHERE tl.location LIKE \"" + trackPath + "\" AND l.id=tl.id AND l.rating<>" + rating +");";
   Amarok.debug("Amarixxx:Amarok " + msql);
   query.exec(msql);
   if (query.numRowsAffected()>0){
     countUpdated++;
     Amarok.debug("Amarixxx:Mixxx Updated rating=" + rating + " for " + trackPath );
-    
+
   }
 
 }
 
 function updateMixxx(){
-	try{
-	
-	Amarok.debug("UPDATE MIXXX");
-		
-	amarokSql = "SELECT s.rating, CONCAT(d.lastmountpoint,SUBSTR(u.rpath,2)) " +
-		  "FROM tracks AS t,urls AS u, statistics AS s, devices AS d " +
-		  "WHERE t.id=u.id " +
-		  "AND u.deviceid = d.id " +
-		  "AND t.id=s.id ;";
-		
-	Amarok.debug("Amarixxx:query = "  + amarokSql);
-	var amarokTracks = Amarok.Collection.query(amarokSql);
-	
-  f = new QFile(mixxxDBPath);
-  if (!f.exists()){
-	  throw(mixxxDBPath + " does not exist");
-  }
-  mixxxDB = QSqlDatabase.addDatabase("QSQLITE", "");
-  mixxxDB.setDatabaseName(mixxxDBPath);
-  mixxxDB.open();
+  try{
 
-	mixxxDB.setDatabaseName(mixxxDBPath);
-	mixxxDB.open();
-	query = new QSqlQuery(mixxxDB);
-	var cnt = 0;
-	for (i=0; i< amarokTracks.length; i+=2){
+    Amarok.debug("UPDATE MIXXX");
+
+    amarokSql = "SELECT s.rating, CONCAT(d.lastmountpoint,SUBSTR(u.rpath,2)) " +
+      "FROM tracks AS t,urls AS u, statistics AS s, devices AS d " +
+      "WHERE t.id=u.id " +
+      "AND u.deviceid = d.id " +
+      "AND t.id=s.id ;";
+
+    Amarok.debug("Amarixxx:query = "  + amarokSql);
+    var amarokTracks = Amarok.Collection.query(amarokSql);
+
+    f = new QFile(mixxxDBPath);
+    if (!f.exists()){
+      throw(mixxxDBPath + " does not exist");
+    }
+    mixxxDB = QSqlDatabase.addDatabase("QSQLITE", "");
+    mixxxDB.setDatabaseName(mixxxDBPath);
+    mixxxDB.open();
+
+    mixxxDB.setDatabaseName(mixxxDBPath);
+    mixxxDB.open();
+    query = new QSqlQuery(mixxxDB);
+  } catch( err ){
+    Amarok.debug( err );
+    Amarok.alert("Amarixx-Error\n" + err);
+  }
+  var cnt = 0;
+  for (i=0; i< amarokTracks.length; i+=2){
     var rating = Math.floor(amarokTracks[i] / 2);
     var trackPath=amarokTracks[i+1];
-    updateTrackIfDifferent(trackPath, rating);
-		cnt = i/2; //  path, rating
-		if ( cnt % 1000 == 0){
-			Amarok.Window.Statusbar.shortMessage("amarixxx: " + cnt + " songs checked");
-		}
-	}
-	mixxxDB.close();
-	Amarok.alert("Mixxx db " + countUpdated + " updated.");
-	} catch( err ){
-	    Amarok.debug( err );
-	    Amarok.alert("Amarixx-Error\n" + err);
-	}
+    try{
+      updateTrackIfDifferent(trackPath, rating);
+      cnt = i/2; //  path, rating
+      if ( cnt % 1000 == 0){
+        Amarok.Window.Statusbar.shortMessage("amarixxx: " + cnt + " songs checked");
+      }} catch( err ){
+        Amarok.debug( err );
+        Amarok.alert("Amarixx-Error\n" + err);
+      }
+  }
+  mixxxDB.close();
+  Amarok.alert("Mixxx db " + countUpdated + " updated.");
+
 }
 
 
 function saveConfiguration()
 {
-	mixxxDBPath = mainWindow.lineEdit.text;
-	Amarok.Script.writeConfig( "mixxx-DB", mixxxDBPath  );
+  mixxxDBPath = mainWindow.lineEdit.text;
+  Amarok.Script.writeConfig( "mixxx-DB", mixxxDBPath  );
 }
 
 function readConfiguration()
 {
-	mixxxDBPath = Amarok.Script.readConfig(
-		"mixxx-DB",
-		QDir.homePath() + "/.mixxx/mixxxdb.sqlite"
-	);
-	mainWindow.lineEdit.text = mixxxDBPath;
+  mixxxDBPath = Amarok.Script.readConfig(
+      "mixxx-DB",
+      QDir.homePath() + "/.mixxx/mixxxdb.sqlite"
+      );
+  mainWindow.lineEdit.text = mixxxDBPath;
 }
 
 function openSettings()
 {
-    mainWindow.show();
+  mainWindow.show();
 }
 
 function init()
 {
-    try
-    {
-        // Ui stuff
-        var UIloader = new QUiLoader( this );
-        var uifile = new QFile ( Amarok.Info.scriptPath() + "/amarixxx.ui" );
-        uifile.open( QIODevice.ReadOnly );
-        mainWindow = UIloader.load( uifile, this ); //load the ui file
-        uifile.close();
+  try
+  {
+    // Ui stuff
+    var UIloader = new QUiLoader( this );
+    var uifile = new QFile ( Amarok.Info.scriptPath() + "/amarixxx.ui" );
+    uifile.open( QIODevice.ReadOnly );
+    mainWindow = UIloader.load( uifile, this ); //load the ui file
+    uifile.close();
 
 
-        readConfiguration();
-        mainWindow.buttonBox.accepted.connect( saveConfiguration );
-        mainWindow.buttonBox.rejected.connect( readConfiguration );
+    readConfiguration();
+    mainWindow.buttonBox.accepted.connect( saveConfiguration );
+    mainWindow.buttonBox.rejected.connect( readConfiguration );
 
-        Amarok.Window.addSettingsMenu( "amarixxx", "Amarixxx Settings", "icon" );
-        Amarok.Window.SettingsMenu.amarixxx['triggered()'].connect(openSettings );
+    Amarok.Window.addSettingsMenu( "amarixxx", "Amarixxx Settings", "icon" );
+    Amarok.Window.SettingsMenu.amarixxx['triggered()'].connect(openSettings );
 
-        Amarok.Window.addToolsMenu( "upd_mixxx", "Update mixxx", "icon" );
-        Amarok.Window.ToolsMenu.upd_mixxx['triggered()'].connect(updateMixxx);
+    Amarok.Window.addToolsMenu( "upd_mixxx", "Update mixxx", "icon" );
+    Amarok.Window.ToolsMenu.upd_mixxx['triggered()'].connect(updateMixxx);
 
-    }
-    catch( err )
-    {
-        Amarok.debug( err );
-    }
+  }
+  catch( err )
+  {
+    Amarok.debug( err );
+  }
 }
 
 init();
