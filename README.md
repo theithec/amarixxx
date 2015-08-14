@@ -1,12 +1,10 @@
 amarixxx
 ========
-
-Amaroks ratings to mixxx
+Export Amaroks ratings to Mixxx
 
 
 ## Requirements:
 Mixxx (http://www.mixxx.org/).
-Mixxx' database is expected to be found at ~/.mixxx/mixxxdb.sqlite
 
 
 ## Install
@@ -16,19 +14,14 @@ extract the zip-file and rename the folder to amarixxx
 Restart amarok.
 
 
-
 ## Usage
-
-amarok->extras->update mixxx
-
+amarok->extras->Update Mixxx
 
 
 ## Settings
+amarok->settings->Amarixxx settings
+Set path to the Mixxx database if it's not ~/.mixxx/mixxxdb.sqlite
 
-amarok->settings->amarixxx
-
-mountpoint of the device where the collection lives. Default: "/".
-(I didn't find an easy way to get the absolute path)
 
 ## Problems
 try amarok --debug
