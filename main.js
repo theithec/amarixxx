@@ -35,7 +35,7 @@ Importer.loadQtBinding("qt.sql");
 
 var mainWindow;
 var mixxxDBPath;  
-var mixxxDb; 
+var mixxxDB; 
 var query;
 var countUpdated = 0;
 function updateTrackIfDifferent(trackPath, rating){
@@ -70,13 +70,13 @@ function updateMixxx(){
   if (!f.exists()){
 	  throw(mixxxDBPath + " does not exist");
   }
-  mixxxDb = QSqlDatabase.addDatabase("QSQLITE", "");
-  mixxxDb.setDatabaseName(mixxxDBPath);
-  mixxxDb.open();
+  mixxxDB = QSqlDatabase.addDatabase("QSQLITE", "");
+  mixxxDB.setDatabaseName(mixxxDBPath);
+  mixxxDB.open();
 
-	mixxxDb.setDatabaseName(mixxxDBPath);
-	mixxxDb.open();
-	query = new QSqlQuery(mixxxDb);
+	mixxxDB.setDatabaseName(mixxxDBPath);
+	mixxxDB.open();
+	query = new QSqlQuery(mixxxDB);
 	var cnt = 0;
 	for (i=0; i< amarokTracks.length; i+=2){
     var rating = Math.floor(amarokTracks[0] / 2);
