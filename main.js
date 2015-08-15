@@ -93,6 +93,7 @@ function updateMixxx(){
       }} catch( err ){
         Amarok.debug( err );
         Amarok.alert("Amarixx-Error\n" + err);
+        break;
       }
   }
   mixxxDB.close();
