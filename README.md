@@ -5,6 +5,7 @@ Export Amaroks ratings to Mixxx
 
 ## Requirements:
 Mixxx (http://www.mixxx.org/).
+Mixxx and Amarok sharing the same collection/library
 
 
 ## Install
